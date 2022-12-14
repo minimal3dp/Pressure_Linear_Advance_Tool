@@ -560,12 +560,12 @@
                         instead.</i>
                     </p>
                     <p id=startGcodeWarning style="display: none;">warning</p>
-                    </p><textarea id="START_GCODE" onblur=validate()></textarea>
+                    </p><textarea id="START_GCODE" data-settings></textarea>
                   </td>
                 </tr>
                 <tr>
-                  <td><label for=END_GCODE onblur=validate()>End G-code</label></td>
-                  <td colspan=3><textarea id="END_GCODE">PRINT_END</textarea>
+                  <td><label for=END_GCODE>End G-code</label></td>
+                  <td colspan=3><textarea id="END_GCODE" data-settings>PRINT_END</textarea>
                     <p>Copy your normal end G-code from your slicer (and replace any dynamic variables with real
                       values).
                   </td>

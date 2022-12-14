@@ -183,13 +183,14 @@ const Settings = {
   zhop_height: 0.1,
 
   applyLsSettings() {
-  // Get localStorage data
-    let lsSettings = window.localStorage.getItem('PA_SETTINGS');
+    // Get localStorage data
+    let lsSettings = window.localStorage.getItem("PA_SETTINGS");
 
     if (lsSettings) {
       let localSettings = jQuery.parseJSON(lsSettings);
-      if (localSettings['SETTINGS_VERSION'] == DEFAULT_SETTINGS.SETTINGS_VERSION) { // only populate form with saved settings if version matches current
-        Object.assign(config, localSettings)
+      if (localSettings["SETTINGS_VERSION"] == DEFAULT_SETTINGS.SETTINGS_VERSION) {
+        // only populate form with saved settings if version matches current
+        Object.assign(config, localSettings);
       }
     }
   },
@@ -1861,7 +1862,7 @@ function validate(updateRender = false) {
 
   // Reset all warnings before re-check
   $('[data-settings]').each((i,t) => {
-    t.setCustomValidity('');
+    //t.setCustomValidity('');
     const tid = $(t).attr('id');
     $(`label[for=${tid}]`).removeClass('invalid');
   });
