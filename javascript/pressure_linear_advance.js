@@ -182,6 +182,18 @@ const Settings = {
   zhop_enable: true,
   zhop_height: 0.1,
 
+  applyLsSettings() {
+  // Get localStorage data
+    let lsSettings = window.localStorage.getItem('PA_SETTINGS');
+
+    if (lsSettings) {
+      let localSettings = jQuery.parseJSON(lsSettings);
+      if (localSettings['SETTINGS_VERSION'] == DEFAULT_SETTINGS.SETTINGS_VERSION) { // only populate form with saved settings if version matches current
+        Object.assign(config, localSettings)
+      }
+    }
+  },
+
   /**
    * Write out the current values to the HTML form
    */
@@ -200,6 +212,7 @@ const Settings = {
    * Monitor the HTML page for input parameter changes
    */
   attachForm() {
+    this.applyLsSettings();
     this.writeValuesToForm();
     $("[data-settings]").on("blur change", (event) => {
       this.onChange(event);
@@ -2077,16 +2090,6 @@ $(window).load(() => {
   config.attachForm()
 
   toggleStartEndGcode();
-
-  // Get localStorage data
-  var lsSettings = window.localStorage.getItem('PA_SETTINGS');
-
-  if (lsSettings) {
-    var settings = jQuery.parseJSON(lsSettings);
-    if (settings['SETTINGS_VERSION'] == DEFAULT_SETTINGS.SETTINGS_VERSION) { // only populate form with saved settings if version matches current
-      Object.assign(config, settings)
-    }
-  }
 
   // run all toggles after loading user settings
   toggleBedShape();
