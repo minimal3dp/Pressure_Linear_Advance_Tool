@@ -127,7 +127,7 @@ const Settings = {
   // increment to invalidate saved settings
   settings_version: 3,
 
-  acceleration: 5000,
+  acceleration: 750,
   acceleration_enable: false,
 
   anchor_option: "anchor_frame",
@@ -246,7 +246,7 @@ const Settings = {
     if (elem.is(":checkbox")) {
       this[prop_name] = elem.is(":checked");
       let state = this[prop_name] ? "" : "disabled";
-      $(`[data-toggle-${prop_name}]`).prop("disabled", state);
+      //$(`[data-toggle-${prop_name}]`).prop("disabled", state);
     } else {
       switch (typeof this[prop_name]) {
         case "number":
@@ -266,6 +266,8 @@ const Settings = {
 
     let updateRender = typeof elem.data("render") !== "undefined";
     switch (elem.attr("id")) {
+      case "ACCELERATION_ENABLE":
+        toggleAcceleration();
       case "FIRMWARE":
         toggleFirmwareOptions();
         toggleFirmwareValues();
@@ -1627,7 +1629,7 @@ function toggleAcceleration(){
       $('#ACCELERATION').val(DEFAULT_SETTINGS.acceleration)
     }
   } else {
-    //$('#ACCELERATION').val('')
+    $('#ACCELERATION').val('')
     $('#ACCELERATION').prop('disabled', true);
   }
 }
