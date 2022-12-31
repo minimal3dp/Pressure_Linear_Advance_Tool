@@ -31,7 +31,7 @@ const ENCROACHMENT = 1/3;
 const START_GCODES = {
   klipper: `
     PRINT_START ; Start macro
-    ; START_PRINT ; Start macro
+    ; START_PRINT ; Start macro (alternate / official start macro name)
   `,
   marlin1_1_8: `
     G28                 ; Home all axes
@@ -62,9 +62,9 @@ const START_GCODES = {
 
 const END_GCODES = {
   klipper: `PRINT_END ; End macro. Change name to match yours`,
-  rrf3: `M0    ; Stop`,
-  marlin1_1_9: `M501    ; Load settings from EEPROM (to restore previous values)`,
-  marlin1_1_8: `M501    ; Load settings from EEPROM (to restore previous values)`,
+  rrf3: `M0 ; Stop`,
+  marlin1_1_9: `M501 ; Load settings from EEPROM (to restore previous values)`,
+  marlin1_1_8: `M501 ; Load settings from EEPROM (to restore previous values)`,
 };
 
 const State = {
@@ -286,14 +286,23 @@ const Settings = {
     // Add M109 / M190 if user didn't add & didn't opt out
     if (!config.start_gcode_no_heating) {
       if (!gcode.match(/\[HOTEND_TEMP\]/g)) {
-        gcode = `M109 S[HOTEND_TEMP] ; Set & wait for hotend temp\n${gcode}`; // variable will get replaced below
+        if (!gcode.match(/G28(?! Z)/gm)) { // If user does not have a G28
+          gcode = `M109 S[HOTEND_TEMP] ; Set & wait for hotend temp\n${gcode}`; // Prepend. Variable will get replaced below
+        } else {
+          gcode = gcode.replace(/G28(?! Z).*?\n/gm, `$&M109 S[HOTEND_TEMP] ; Set & wait for hotend temp\n`); // Insert below user's G28 instead. Variable will get replaced below
+        }
       }
       if (!gcode.match(/\[BED_TEMP\]/g)) {
-        gcode = `M190 S[BED_TEMP] ; Set & wait for bed temp\n${gcode}`; // variable will get replaced below
+        if (!gcode.match(/G28(?! Z)/gm)) { // If user does not have a G28
+          gcode = `M190 S[BED_TEMP] ; Set & wait for bed temp\n${gcode}`; // Prepend. Variable will get replaced below
+        }
+        else {
+          gcode = gcode.replace(/G28(?! Z).*?\n/gm, `$&M190 S[BED_TEMP] ; Set & wait for bed temp\n`); // Insert below user's G28 instead. Variable will get replaced below
+        }
       }
     }
 
-    // Add G28 if user didn't add & didn't opt out
+    // Prepend G28 if user didn't add & didn't opt out
     if (!config.start_gcode_no_homing) {
       if (!gcode.match(/G28(?! Z)/gm)) {
         gcode = `G28 ; Home all axes\n${gcode}`;
