@@ -1985,17 +1985,6 @@ function validate(updateRender = false) {
     validationFail = true;
   }
 
-  // Check text inputs
-  /*
-  if ($('#EXTRUDER_NAME').val() == '' || $('#EXTRUDER_NAME').val() == null) {
-    $('label[for=EXTRUDER_NAME]').addClass('invalid');
-    $('#warning3').text('Extruder name cannot be blank.');
-    $('#warning3').addClass('invalid');
-    $('#warning3').show();
-    validationFail = true;
-  }
-  */
-
   if (!validationFail) {
     // only check if above checks pass
     // Check if pressure advance stepping is a multiple of the pressure advance Range
@@ -2017,6 +2006,21 @@ function validate(updateRender = false) {
       validationFail = true;
     }
   }
+
+    if (!validationFail) {
+      // only check if above checks pass
+      // Check if PA smooth exceeds 0.2
+      if (config.pa_smooth && config.pa_end > 0.2){
+          $("label[for=PA_END]").addClass("invalid");
+          $("#warning1").text(
+            "PA smooth cannot exceed 0.2."
+          );
+          $("#warning1").addClass("invalid");
+          $("#warning1").show();
+          invalid = 1;
+          validationFail = true;
+      }
+    }
 
   if (!validationFail) {
     // only check if above checks pass
