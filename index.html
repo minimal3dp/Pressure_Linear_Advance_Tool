@@ -15,7 +15,7 @@
   <script language="JavaScript" type="text/javascript" src="./javascript/jquery-2.2.1.min.js?v1"></script>
   <script language="JavaScript" type="text/javascript" src="./javascript/jquery-ui.min.js?v1"></script>
   <script language="JavaScript" type="text/javascript" src="./javascript/FileSaver.min.js?v1"></script>
-  <script language="JavaScript" type="text/javascript" src="./javascript/pressure_linear_advance.js?v22"></script>
+  <script language="JavaScript" type="text/javascript" src="./javascript/pressure_linear_advance.js?v23"></script>
   <script src="./javascript/gcode-viewer.js?v1"></script>
   <div class="container" role="main">
     <div class="row">
@@ -83,7 +83,7 @@
           <thead>
             <td colspan=4 class=tdHead>
               <h3>Settings</h3>
-              <h5 style="color:rgb(172, 74, 160);">Advanced Mode <input type=checkbox id="EXPERT_MODE" data-settings />
+              <h5 style="color:rgb(172, 74, 160);">Advanced Mode <input type=checkbox id="EXPERT_MODE" data-settings data-render />
               </h5>
               <br>
               <input type=button id="saveSettingsButton" onclick=setLocalStorage() value="Save Settings to Browser"
@@ -101,7 +101,7 @@
               <tr>
                 <td><label for="FIRMWARE">Firmware</td>
                 <td class=inputCell>
-                  <select id="FIRMWARE" data-settings>
+                  <select id="FIRMWARE" data-settings data-render>
                     <option value="klipper">Klipper</option>
                     <option value="marlin1_1_9">Marlin 1.1.9+</option>
                     <option value="marlin1_1_8">Marlin 1.1.8 & Older</option>

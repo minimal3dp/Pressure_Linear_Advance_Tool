@@ -256,7 +256,6 @@ const Settings = {
       default:
         break;
     }
-
     validate(updateRender);
   },
 
@@ -1585,7 +1584,6 @@ function toggleSEGcode(){
   $('#START_GCODE').val(config.startGCode())
   $('#END_GCODE').val(config.endGCode())
   previewStartGcode();
-  validate();
 }
 
 function toggleAcceleration() {
@@ -1642,8 +1640,6 @@ function toggleExpertMode() {
     $("label[for=ANCHOR_LAYER_LINE_RATIO]").parent().hide();
     $("#ANCHOR_LAYER_LINE_RATIO").parent().hide();
   }
-
-  validate(true);
 }
 
 function toggleFirmwareOptions(){
@@ -1728,30 +1724,18 @@ Once you find a general range, run again with narrower range / finer increment.<
 }
 
 function toggleFirmwareValues() {
-  config.start_gcode = "";
-  switch (true) {
-    case $("#FIRMWARE").val() === "marlin1_1_9":
-      $("#PA_START").val(0);
-      $("#PA_END").val(0.08);
-      $("#PA_STEP").val(0.005);
-      break;
-    case $("#FIRMWARE").val() === "marlin1_1_8":
-      $("#PA_START").val(0);
-      $("#PA_END").val(4);
-      $("#PA_STEP").val(0.2);
-      break;
-    case $("#FIRMWARE").val() === "klipper":
-      $("#PA_START").val(0);
-      $("#PA_END").val(0.08);
-      $("#PA_STEP").val(0.005);
-      break;
-    case $("#FIRMWARE").val() === "rrf3":
-      $("#PA_START").val(0);
-      $("#PA_END").val(0.08);
-      $("#PA_STEP").val(0.005);
-      break;
+  config.start_gcode = ""; // clear to use default
+  config.end_gcode = ""; // clear to use default
+
+  if (config.firmware === "marlin1_1_8") {
+    config.pa_start = 0;
+    config.pa_end = 4;
+    config.pa_step = 0.2;
+  } else {
+    config.pa_start = 0;
+    config.pa_end = 0.08;
+    config.pa_step = 0.005;
   }
-  validate(true);
 }
 
 function togglePatternOptions(){
