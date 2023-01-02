@@ -28,26 +28,19 @@ const GLYPH_PADDING_VERTICAL = 1;
 
 const ENCROACHMENT = 1/3;
 
+const State = {
+  cur_x: 0.0,
+  cur_y: 0.0,
+  cur_z: 0.0,
+  retracted: false,
+  hopped: false,
+  pa_script: "",
+};
+
 const START_GCODES = {
   klipper: `
     PRINT_START ; Start macro
     ; START_PRINT ; Start macro (alternate / official start macro name)
-  `,
-  marlin1_1_8: `
-    G28                 ; Home all axes
-    G90                 ; Absolute XYZ
-    G1 Z5 F100          ; Z raise
-    M190 S[BED_TEMP]    ; Set & wait for bed temp
-    M109 S[HOTEND_TEMP] ; Set & wait for hotend temp
-    ;G29                ; Auto bed leveling
-  `,
-  marlin1_1_9: `
-    G28                 ; Home all axes
-    G90                 ; Absolute XYZ
-    G1 Z5 F100          ; Z raise
-    M190 S[BED_TEMP]    ; Set & wait for bed temp
-    M109 S[HOTEND_TEMP] ; Set & wait for hotend temp
-    ;G29                ; Auto bed leveling
   `,
   rrf3: `
     G28                 ; Home all axes
@@ -58,6 +51,22 @@ const START_GCODES = {
     G32                 ; Run bed.g macro
     G28 Z               ; Home Z
   `,
+  marlin1_1_9: `
+    G28                 ; Home all axes
+    G90                 ; Absolute XYZ
+    G1 Z5 F100          ; Z raise
+    M190 S[BED_TEMP]    ; Set & wait for bed temp
+    M109 S[HOTEND_TEMP] ; Set & wait for hotend temp
+    ;G29                ; Auto bed leveling
+  `,
+  marlin1_1_8: `
+    G28                 ; Home all axes
+    G90                 ; Absolute XYZ
+    G1 Z5 F100          ; Z raise
+    M190 S[BED_TEMP]    ; Set & wait for bed temp
+    M109 S[HOTEND_TEMP] ; Set & wait for hotend temp
+    ;G29                ; Auto bed leveling
+  `,
 };
 
 const END_GCODES = {
@@ -65,15 +74,6 @@ const END_GCODES = {
   rrf3: `M0 ; Stop`,
   marlin1_1_9: `M501 ; Load settings from EEPROM (to restore previous values)`,
   marlin1_1_8: `M501 ; Load settings from EEPROM (to restore previous values)`,
-};
-
-const State = {
-  cur_x: 0.0,
-  cur_y: 0.0,
-  cur_z: 0.0,
-  retracted: false,
-  hopped: false,
-  pa_script: "",
 };
 
 const Settings = {
@@ -285,18 +285,25 @@ const Settings = {
     // Add M109 / M190 if user didn't add & didn't opt out
     if (!config.start_gcode_no_heating) {
       if (!gcode.match(/\[HOTEND_TEMP\]/g)) {
-        if (!gcode.match(/G28(?! Z)/gm)) { // If user does not have a G28
+        if (!gcode.match(/G28(?! Z)/gm)) {
+          // If user does not have a G28
           gcode = `M109 S[HOTEND_TEMP] ; Set & wait for hotend temp\n${gcode}`; // Prepend. Variable will get replaced below
         } else {
-          gcode = gcode.replace(/G28(?! Z).*?\n/gm, `$&M109 S[HOTEND_TEMP] ; Set & wait for hotend temp\n`); // Insert below user's G28 instead. Variable will get replaced below
+          gcode = gcode.replace(
+            /G28(?! Z).*?\n/gm,
+            `$&M109 S[HOTEND_TEMP] ; Set & wait for hotend temp\n`
+          ); // Insert below user's G28 instead. Variable will get replaced below
         }
       }
       if (!gcode.match(/\[BED_TEMP\]/g)) {
-        if (!gcode.match(/G28(?! Z)/gm)) { // If user does not have a G28
+        if (!gcode.match(/G28(?! Z)/gm)) {
+          // If user does not have a G28
           gcode = `M190 S[BED_TEMP] ; Set & wait for bed temp\n${gcode}`; // Prepend. Variable will get replaced below
-        }
-        else {
-          gcode = gcode.replace(/G28(?! Z).*?\n/gm, `$&M190 S[BED_TEMP] ; Set & wait for bed temp\n`); // Insert below user's G28 instead. Variable will get replaced below
+        } else {
+          gcode = gcode.replace(
+            /G28(?! Z).*?\n/gm,
+            `$&M190 S[BED_TEMP] ; Set & wait for bed temp\n`
+          ); // Insert below user's G28 instead. Variable will get replaced below
         }
       }
     }
@@ -708,154 +715,74 @@ function genGcode() {
 ; Generated: ${new Date()}
 ; -------------------------------------------
 ;
-; Advanced mode: ${config.expert_mode}
+; Advanced Mode: ${config.expert_mode}
 ;
 ; Printer:
 ;  - Firmware: ${config.firmware}
 ;  - Bed Shape: ${config.bed_shape}
-${
-  config.bed_shape === "Round"
-    ? `;  - Bed Diameter: ${config.bedX()} mm\n`
-    : `;  - Bed Size X: ${config.bedX()} mm\n`
-}\
-${config.bed_shape === "Round" ? "" : `;  - Bed Size Y: ${config.bedY()} mm\n`}\
-;  - Origin Bed Center: ${config.originCenter() ? "true" : "false"}
-${
-  config.expert_mode &&
-  config.firmware == "klipper" &&
-  config.extruderNameEnable()
-    ? `;  - Extruder Name: ${config.extruderName()}\n`
-    : ""
-}\
-${
-  config.expert_mode &&
-  config.firmware == "klipper" &&
-  !config.extruderNameEnable()
-    ? `;  - Extruder Name: Disabled\n`
-    : ""
-}\
-${
-  config.expert_mode && config.firmware != "klipper" && config.toolIndex() != 0
-    ? `;  - Tool Index: ${config.toolIndex()}\n`
-    : ""
-}\
-${
-  config.expert_mode && config.firmware != "klipper" && config.toolIndex() == 0
-    ? `;  - Tool Index: Disabled (0)\n`
-    : ""
-}\
+${(config.bed_shape === 'Round' ? `;  - Bed Diameter: ${config.bedX()} mm\n`: `;  - Bed Size X: ${config.bedX()} mm\n`)}\
+${(config.bed_shape === 'Round' ? '': `;  - Bed Size Y: ${config.bedY()} mm\n`)}\
+;  - Origin Bed Center: ${(config.originCenter() ? 'true': 'false')}
+${(config.expert_mode && config.firmware == 'klipper' && config.extruderNameEnable() ? `;  - Extruder Name: ${config.extruderName()}\n` : '')}\
+${(config.expert_mode && config.firmware == 'klipper' && !config.extruderNameEnable() ? `;  - Extruder Name: Disabled\n` : '')}\
+${(config.expert_mode && config.firmware != 'klipper' && config.toolIndex() != 0 ? `;  - Tool Index: ${config.toolIndex()}\n` : '')}\
+${(config.expert_mode && config.firmware != 'klipper' && config.toolIndex() == 0 ? `;  - Tool Index: Disabled (0)\n` : '')}\
 ;  - Travel Speed: ${config.speed_travel} mm/s
 ;  - Nozzle Diameter: ${config.nozzle_diameter} mm
 ;  - Filament Diameter: ${config.filament_diameter} mm
 ;  - Extrusion Multiplier: ${config.ext_mult}
 ;
 ; Retraction / Z Hop:
-${
-  config.expert_mode ? `;  - Firmware Retraction: ${config.fwRetract()}\n` : ""
-}\
-${
-  !config.fwRetract()
-    ? `;  - Retraction Distance: ${config.retract_dist} mm\n`
-    : ""
-}\
-${
-  !config.fwRetract()
-    ? `;  - Retract Speed: ${config.speed_retract} mm/s\n`
-    : ""
-}\
-${
-  !config.fwRetract()
-    ? `;  - Unretract Speed: ${config.speed_unretract} mm/s\n`
-    : ""
-}\
+${(config.expert_mode ? `;  - Firmware Retraction: ${config.fwRetract()}\n` : '')}\
+${(!config.fwRetract() ? `;  - Retraction Distance: ${config.retract_dist} mm\n` : '')}\
+${(!config.fwRetract() ? `;  - Retract Speed: ${config.speed_retract} mm/s\n` : '')}\
+${(!config.fwRetract() ? `;  - Unretract Speed: ${config.speed_unretract} mm/s\n` : '')}\
 ;  - Z Hop Enable: ${config.zhop_enable}
-${config.zhop_enable ? `;  - Z Hop Height: ${config.zhop_height}mm\n` : ""}\
+${(config.zhop_enable ? `;  - Z Hop Height: ${config.zhop_height}mm\n`: '')}\
 ;
 ; First Layer Settings:
 ;  - First Layer Height: ${config.height_firstlayer} mm
 ;  - First Layer Printing Speed: ${config.speed_firstlayer} mm/s
 ;  - First Layer Fan Speed: ${config.fan_speed_firstlayer}%
 ;  - Anchor Option: ${config.anchor_option}
-${
-  config.expert_mode && config.anchor_option == "anchor_frame"
-    ? `;  - Anchor Frame Perimeters: ${config.anchorPerimeters()}\n`
-    : ""
-}\
-${
-  config.expert_mode && config.anchor_option != "no_anchor"
-    ? `;  - Anchor Line Width: ${config.anchor_layer_line_ratio} %\n`
-    : ""
-}\
+${(config.expert_mode && config.anchor_option == 'anchor_frame' ? `;  - Anchor Frame Perimeters: ${config.anchorPerimeters()}\n`: '')}\
+${(config.expert_mode && config.anchor_option != 'no_anchor' ? `;  - Anchor Line Width: ${config.anchor_layer_line_ratio} %\n`: '')}\
 ;
 ; Print Settings:
-${config.expert_mode ? `;  - Line Width: ${config.lineRatio()} %\n` : ""}\
-${config.expert_mode ? `;  - Layer Count: ${config.numLayers()}\n` : ""}\
+${(config.expert_mode ? `;  - Line Width: ${config.lineRatio()} %\n`: '')}\
+${(config.expert_mode ? `;  - Layer Count: ${config.numLayers()}\n` : '')}\
 ;  - Layer Height: ${config.height_layer} mm
 ;  - Print Speed: ${config.speed_perimeter} mm/s
-;  - Acceleration: ${
-    config.acceleration_enable ? `${config.acceleration} mm/s^2` : `Disabled`
-  }
+;  - Acceleration: ${config.acceleration_enable ? `${config.acceleration} mm/s^2` : `Disabled`}
 ;  - Fan Speed: ${config.fan_speed}%
 ;
-${
-  config.expert_mode
-    ? `; Pattern Settings ${
-        !config.pattern_options_enable ? `(Using defaults)` : "`(Customized)`"
-      }:\n`
-    : ""
-}\
-${config.expert_mode ? `;  - Wall Count: ${config.wallCount()}\n` : ""}\
-${
-  config.expert_mode ? `;  - Side Length: ${config.wallSideLength()} mm\n` : ""
-}\
-${config.expert_mode ? `;  - Spacing: ${config.patternSpacing()} mm\n` : ""}\
-${
-  config.expert_mode
-    ? `;  - Corner Angle: ${config.cornerAngle()} degrees \n`
-    : ""
-}\
-${
-  config.expert_mode
-    ? `;  - Printing Direction: ${config.printDir()} degree\n`
-    : ""
-}\
-${config.expert_mode ? ";\n" : ""}\
+${(config.expert_mode ? `; Pattern Settings ${(!config.pattern_options_enable ? `(Using defaults)`: '`(Customized)`')}:\n` : '')}\
+${(config.expert_mode ? `;  - Wall Count: ${config.wallCount()}\n` : '')}\
+${(config.expert_mode ? `;  - Side Length: ${config.wallSideLength()} mm\n` : '')}\
+${(config.expert_mode ? `;  - Spacing: ${config.patternSpacing()} mm\n` : '')}\
+${(config.expert_mode ? `;  - Corner Angle: ${config.cornerAngle()} degrees \n` : '')}\
+${(config.expert_mode ? `;  - Printing Direction: ${config.printDir()} degree\n` : '')}\
+${(config.expert_mode ? ';\n' : '')}\
 ; Pressure Advance Stepping:
-;  - ${
-    config.firmware.includes("marlin") ? "LA" : "PA"
-  } Start Value: ${Math.round10(config.pa_start, PA_round)}
-;  - ${config.firmware.includes("marlin") ? "LA" : "PA"} End Value: ${
-    config.pa_end
-  }
-;  - ${config.firmware.includes("marlin") ? "LA" : "PA"} Increment: ${
-    config.pa_step
-  }
-${
-  config.expert_mode && config.firmware == "klipper"
-    ? `;  - Increment Smooth Time Instead: ${config.paSmooth()}\n`
-    : ""
-}\
-${config.expert_mode ? `;  - Show on LCD: ${config.showLcd()}\n` : ""}\
-${config.expert_mode ? `;  - Number Tab: ${config.useLineNo()}\n` : ""}\
-${
-  config.expert_mode
-    ? `${
-        config.useLineNo()
-          ? `;  - No Leading Zeroes: ${config.lineNoNoLeadingZero()}\n`
-          : ""
-      }`
-    : ""
-}\
+;  - ${(config.firmware == 'klipper' || config.firmware == 'rrf3' ? 'PA' : 'LA')} Start Value: ${Math.round10(config.pa_start, PA_round)}
+;  - ${(config.firmware == 'klipper' || config.firmware == 'rrf3' ? 'PA' : 'LA')} End Value: ${config.pa_end}
+;  - ${(config.firmware == 'klipper' || config.firmware == 'rrf3' ? 'PA' : 'LA')} Increment: ${config.pa_step}
+${(config.expert_mode && config.firmware == 'klipper' ? `;  - Increment Smooth Time Instead: ${config.paSmooth()}\n` : '')}\
+${(config.expert_mode ? `;  - Show on LCD: ${config.showLcd()}\n` : '')}\
+${(config.expert_mode ? `;  - Number Tab: ${config.useLineNo()}\n` : '')}\
+${(config.expert_mode ? `${(config.useLineNo() ? `;  - No Leading Zeroes: ${config.lineNoNoLeadingZero()}\n`: '')}` : '')}\
 ;
 ; Start / End G-code:
 ;  - Hotend Temp: ${config.hotend_temp}C
 ;  - Bed Temp: ${config.bed_temp}C
+;  - Don't Add G28: ${config.start_gcode_no_homing}
+;  - Don't Add Heating G-Codes: ${config.start_gcode_no_heating}
 ;
 ; Calculated Values:
 ;  - Print Size X: ${Math.round10(config.fitWidth(), -2)} mm
 ;  - Print Size Y: ${Math.round10(config.fitHeight(), -2)} mm
 ;  - Number of Patterns to Print: ${config.numPatterns()}
-;  - ${config.firmware.includes("marlin") ? "LA" : "PA"} Values: `;
+;  - ${(config.firmware == 'klipper' || config.firmware == 'rrf3' ? 'PA' : 'LA')} Values: `;
 
 for (let i = 0; i < config.numPatterns(); i++){
   state.pa_script += Math.round10((config.pa_start + i * config.pa_step),PA_round);
@@ -893,12 +820,11 @@ if (config.acceleration_enable){
 }
 
   // Move to layer height
-  let x = retract('-', basicSettings, {hop: false});
-  state.pa_script += x +
-               moveToZ(5, basicSettings, {comment: 'Z raise'}) +
-               moveTo(config.patternStartX(), config.patternStartY(), basicSettings, {retract:false, hop:false, comment: 'Move to start position'}) +
-               moveToZ(config.height_firstlayer, basicSettings, {comment: 'Move to start layer height'}) +
-               retract('+', basicSettings, {hop: false})
+  state.pa_script += retract('-', basicSettings, {hop: false}) +
+                    moveToZ(5, basicSettings, {comment: 'Z raise'}) +
+                    moveTo(config.patternStartX(), config.patternStartY(), basicSettings, {retract:false, hop:false, comment: 'Move to start position'}) +
+                    moveToZ(config.height_firstlayer, basicSettings, {comment: 'Move to start layer height'}) +
+                    retract('+', basicSettings, {hop: false})
 
   // Set initial PA             
   if (config.firmware == 'klipper'){

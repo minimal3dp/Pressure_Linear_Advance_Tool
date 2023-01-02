@@ -15,7 +15,7 @@
   <script language="JavaScript" type="text/javascript" src="./javascript/jquery-2.2.1.min.js?v1"></script>
   <script language="JavaScript" type="text/javascript" src="./javascript/jquery-ui.min.js?v1"></script>
   <script language="JavaScript" type="text/javascript" src="./javascript/FileSaver.min.js?v1"></script>
-  <script language="JavaScript" type="text/javascript" src="./javascript/pressure_linear_advance.js?v23"></script>
+  <script language="JavaScript" type="text/javascript" src="./javascript/pressure_linear_advance.js?v24"></script>
   <script src="./javascript/gcode-viewer.js?v1"></script>
   <div class="container" role="main">
     <div class="row">
@@ -83,7 +83,8 @@
           <thead>
             <td colspan=4 class=tdHead>
               <h3>Settings</h3>
-              <h5 style="color:rgb(172, 74, 160);">Advanced Mode <input type=checkbox id="EXPERT_MODE" data-settings data-render />
+              <h5 style="color:rgb(172, 74, 160);">Advanced Mode <input type=checkbox id="EXPERT_MODE" data-settings
+                  data-render />
               </h5>
               <br>
               <input type=button id="saveSettingsButton" onclick=setLocalStorage() value="Save Settings to Browser"
@@ -503,15 +504,10 @@
                   </td>
                 </tr>
                 <tr>
-                  <td><label for=HOTEND_TEMP>Hotend Temp</label></td>
-                  <td class=inputCell colspan="1">
-                    <input type=number id="HOTEND_TEMP" step=1 data-settings /> °C
                   <td><label for=BED_TEMP>Bed Temp</label></td>
                   <td class=inputCell colspan="1">
                     <input type=number id="BED_TEMP" step=1 data-settings /> °C
                   </td>
-                </tr>
-                <tr>
                   <td>
                     <label for=START_GCODE_NO_HOMING>Don't Add G28</label>
                   </td>
@@ -521,6 +517,12 @@
                       <span class="tooltip-text">
                         Use this if you are using a start macro and don't want G28 added.
                       </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td><label for=HOTEND_TEMP>Hotend Temp</label></td>
+                  <td class=inputCell colspan="1">
+                    <input type=number id="HOTEND_TEMP" step=1 data-settings /> °C
                   </td>
                   <td>
                     <label for=START_GCODE_NO_HEATING>Don't Add Heating G-Codes</label>
@@ -554,7 +556,7 @@
                             variables, listed under "Tool Variables" below.</li>
                         </ul>
                       <li>If you use slicer variables in your start g-code APART from bed / hotend temps,
-                          replace them with REAL VALUES instead.</li>
+                        replace them with REAL VALUES instead.</li>
                       <li><strong>Tool Variables</strong> <i>(Optional)</i></li>
                       <ul>
                         <li>These can be used in your start g-code and will be replaced with real values from the
@@ -569,7 +571,6 @@
                         </ul>
                       </ul>
                     </ul>
-
                     <!-- <p id=startGcodeWarning style="display: none;">warning</p> -->
                     </p><textarea id="START_GCODE" data-settings></textarea>
                     <p style="color:red">
