@@ -382,7 +382,7 @@ const Settings = {
   },
 
   numLayers() {
-    if (!this.pattern_options_enable) {
+    if (!this.expert_mode) {
       return DEFAULT_SETTINGS.num_layers;
     }
 
