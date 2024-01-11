@@ -1920,7 +1920,7 @@ function validate(updateRender = false) {
     if (!validationFail) {
       // only check if above checks pass
       // Check if PA smooth exceeds 0.2
-      if (config.pa_smooth && config.pa_end > 0.2){
+      if (config.firmware == 'klipper' && config.pa_smooth && config.pa_end > 0.2){
           $("label[for=PA_END]").addClass("invalid");
           $("#warning1").text(
             "PA smooth cannot exceed 0.2."
