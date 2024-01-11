@@ -777,6 +777,10 @@ ${(config.expert_mode ? `${(config.useLineNo() ? `;  - No Leading Zeroes: ${conf
 ;  - Bed Temp: ${config.bed_temp}C
 ;  - Don't Add G28: ${config.start_gcode_no_homing}
 ;  - Don't Add Heating G-Codes: ${config.start_gcode_no_heating}
+;  - Entered Start G-code: 
+${config.startGCode(true).replace(/^/gm, ";       ")}
+;  - Entered End G-code: 
+${config.endGCode().replace(/^/gm, ";       ")}
 ;
 ; Calculated Values:
 ;  - Print Size X: ${Math.round10(config.fitWidth(), -2)} mm
