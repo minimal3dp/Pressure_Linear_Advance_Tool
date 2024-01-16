@@ -325,11 +325,19 @@ const Settings = {
 
         // PS / SS native variables
         .replace(/{first_layer_temperature.*?}/g, this.hotend_temp)
-        .replace(/\[first_layer_temperature.*?[\]]{1,2}/g, this.hotend_temp) // will also match "[first_layer_temperature[initial_extruder]]"
+        .replace(/\[first_layer_temperature.*?\]+/g, this.hotend_temp) // will also match nested variables like "[first_layer_temperature[initial_extruder]]"
         .replace(/{first_layer_bed_temperature.*?}/g, this.bed_temp)
-        .replace(/\[first_layer_bed_temperature.*?\]/g, this.bed_temp)
+        .replace(/\[first_layer_bed_temperature.*?\]+/g, this.bed_temp)
         .replace(/{chamber_temperature.*?}/g, 0)
-        .replace(/\[chamber_temperature.*?\]/g, 0)
+        .replace(/\[chamber_temperature.*?\]+/g, 0)
+
+        // OrcaSlicer native variables
+        .replace(/{nozzle_temperature_initial_layer.*?}/g, this.hotend_temp)
+        .replace(/\[nozzle_temperature_initial_layer.*?\]+/g, this.hotend_temp)
+        .replace(/{bed_temperature_initial_layer_single.*?}/g, this.bed_temp)
+        .replace(/\[bed_temperature_initial_layer_single.*?\]+/g, this.bed_temp)
+        //.replace(/{chamber_temperature.*?}/g, 0) // same as PS/SS, no need to replace again
+        //.replace(/\[chamber_temperature.*?\]+/g, 0) // same as PS/SS, no need to replace again
 
         // Cura native variables
         .replace(/{material_print_temperature.*?}/g, this.hotend_temp)
