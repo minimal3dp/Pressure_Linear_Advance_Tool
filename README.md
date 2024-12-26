@@ -13,7 +13,10 @@
 - [http://ellis3dp.com/Pressure_Linear_Advance_Tool/lines_method_deprecated/](http://ellis3dp.com/Pressure_Linear_Advance_Tool/lines_method_deprecated/)
 
 ---
+### Basis of Tool:
 
-### Original Marlin calibration tool [by Sineos](https://github.com/Sineos/k-factorjs). Heavily modified/rewritten by Andrew Ellis.
+#### Pressure_Linear_Advance_Tool [by AndrewEllis93] - https://github.com/AndrewEllis93/Pressure_Linear_Advance_Tool
+
+#### Original Marlin calibration tool [by Sineos](https://github.com/Sineos/k-factorjs). Heavily modified/rewritten by Andrew Ellis.
 
 - [Original Version](http://marlinfw.org/tools/lin_advance/k-factor.html)
