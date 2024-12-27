@@ -20,71 +20,25 @@
   <div class="container" role="main">
     <div class="row">
       <div class="pageTitle" id="pageTitle">
-        <h1>Ellis' Pressure Advance / Linear Advance Calibration Tool</h1>
-        <sup>Original <a href="https://marlinfw.org/tools/lin_advance/k-factor.html">Marlin calibration tool</a> by <a
+        <h1>Ellis' Pressure Advance with Adaptive Pressure Advance Settings by Minimal 3DP</h1>
+        Original <a href="https://marlinfw.org/tools/lin_advance/k-factor.html">Marlin calibration tool</a> by <a
             href="https://github.com/Sineos/k-factorjs">Sineos.</a>
-          Heavily modified/rewritten by <a href="https://github.com/AndrewEllis93">Andrew Ellis.</a></sup><br>
-        <sup>The old "lines" version of this tool has been <strong>deprecated.</strong> It's still available <a
-            href="https://ellis3dp.com/Pressure_Linear_Advance_Tool/lines_method_deprecated/">here</a>
-          if you prefer it.</i></sup><br><br>
+          Heavily modified/rewritten by <a href="https://github.com/AndrewEllis93">Andrew Ellis.</a>
+        Edited to include Adaptive Pressure Advance by <a href="https://github.com/minimal3dp">Minimal 3DP</a></sup><br>
+        <br><br>
         For issues/bugs, contributions, and feature requests, please <a
-          href="https://github.com/AndrewEllis93/Pressure_Linear_Advance_Tool/issues">open a GitHub
+          href="https://github.com/minimal3dp/Pressure_Linear_Advance_Tool/issues">open a GitHub
           issue.</a><br><br>
 
       </div>
-      <table id=gcodeTable>
-        <tbody>
-          <thead>
-            <tr>
-              <td colspan=2 class=tdHead style="text-align: center;">
-                <h3>G-code</h3>
-              </td>
-            </tr>
-            <tr>
-              <td class=gcodeTableLeftHeading>
-                <h4>3D Preview</h4> &nbsp;&nbsp;<a href="https://github.com/aligator/gcode-viewer">Source</a><br>
-                <i>Line widths are approximations only.</i><br><br><br><br>
-                <strong>See my</strong><br>
-                <h5><u><a href="https://ellis3dp.com/Print-Tuning-Guide/">Print Tuning Guide</a></u></h5>
-                and
-                <h5><u><a
-                      href="https://ellis3dp.com/Print-Tuning-Guide/articles/pressure_linear_advance/introduction.html">Pressure
-                      / Linear Advance article</a></u></h5>
-                <strong>for demonstrations and examples!</strong>
-              <td class="tdSection" id="gcode-viewer" colspan="2">
-            </tr>
-            <tr>
-              <td class=tdSection></td>
-              <td id=information class=tdSection colspan=2>
-              </td>
-            </tr>
-            <tr class="tdHead">
-              <td colspan=2><label for="FILENAME" style="text-align: left;">File Name:</label></strong>
-                <input type=text id="FILENAME" data-settings />.gcode&nbsp;
-                <input type=button id="downloadButton" onclick="validate(true); saveTextAsFile();"
-                  value="Download G-code" />
-                <font color=red>&nbsp;&nbsp;(Go through ALL the settings first!)</font>
-                <!-- <input type=button id="toggleGcode" onclick="$('#gcodetextarea').parent().toggle();" value="Toggle Gcode Text Preview" /> -->
-                <p id=warning1 style="display: none;">warning</p>
-                <p id=warning2 style="display: none;">warning</p>
-                <p id=warning3 style="display: none;">warning</p>
-                <p id=warning4 style="display: none;">warning</p>
-              </td>
-            </tr>
-            <tr style="display:none;">
-              <td colspan=2 class="txtareatd"><textarea id="gcodetextarea" readonly></textarea></td>
-            </tr>
-          </thead>
-        </tbody>
-      </table>
+      
       <br><br>
       <table>
         <tbody>
           <thead>
             <td colspan=4 class=tdHead>
               <h3>Settings</h3>
-              <h5 style="color:rgb(172, 74, 160);">Advanced Mode <input type=checkbox id="EXPERT_MODE" data-settings
-                  data-render />
+              <h5 style="color:rgb(172, 74, 160);">Advanced Mode <input type=checkbox id="EXPERT_MODE" data-settings data-render />
               </h5>
               <br>
               <input type=button id="saveSettingsButton" onclick=setLocalStorage() value="Save Settings to Browser"
@@ -593,7 +547,128 @@
                   </td>
                 </tr>
               </thead>
+              <thead>
+                <tr>
+                  <td colspan=4 class=tdSection>
+                    <h4>Adaptive Pressure Advance</h4>
+                    <h5 style="color:rgb(172, 74, 160);">Adaptive Pressure Advance Mode <input type=checkbox id="ADAPTIVE_MODE" data-settings data-render />
+                    </h5>
+                    <br>
+                  </td>
+                </tr>
+                <tr class="expert">
+                  <td><label for=LINE_RATIO class="expertLabel">Line Width</label></td>
+                  <td class="inputCell">
+                    <input type=number id="LINE_RATIO" step=0.5 data-settings data-render /> %
+                    <div class="hover-text">&#x1F6C8;
+                      <span class="tooltip-text">
+                        Percentage is based on nozzle diameter.<br><br>
+                        Match your thickest perimeter from your slicer settings (internal/external).
+                      </span>
+                    </div>
+                  </td>
+                  <td><label for=NUM_LAYERS class="expertLabel">Layer Count</label></td>
+                  <td class="inputCell">
+                    <input type=number id="NUM_LAYERS" step=1 data-settings data-render />
+                    <div class="hover-text">&#x1F6C8;
+                      <span class="tooltip-text">
+                        Includes first layer.
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <label for=SPEED_PERIMETER>Print Speed</label>
+                  </td>
+                  <td class=inputCell>
+                    <input type=number id="SPEED_PERIMETER" step=1 data-settings /> mm/s
+                    <div class="hover-text">&#x1F6C8;
+                      <span class="tooltip-text">
+                        Use your external perimeter speed from your slicer settings - if it's reasonably fast
+                        (>60mm/s).<br><br>
+                        If the results are hard to read, try a faster speed.
+                      </span>
+                    </div>
+                  </td>
+                  <td><label for=HEIGHT_LAYE>Layer Height</label></td>
+                  <td class="inputCell">
+                    <input type=number id="HEIGHT_LAYER" step=0.001 data-settings data-render />
+                    mm
+                  </td>
+              
+                </tr>
+                <tr>
+                  <td>
+                    <label for=ACCELERATION>Acceleration</label> <input type=checkbox id="ACCELERATION_ENABLE" data-settings />
+                  </td>
+                  <td class=inputCell>
+                    <input type=number id="ACCELERATION" step=1 data-settings data-toggle-acceleration_enable />
+                    mm/s<sup>2</sup>
+                    <div class="hover-text">&#x1F6C8;
+                      <span class="tooltip-text">
+                        Your <strong>MAX</strong> accel will be used if you don't set this.<br><br>
+                        <strong>Set this if you use acceleration control in your slicer!!</strong><br><br>
+                        (Use your external perimeter acceleration)
+                      </span>
+                    </div> <strong>(!!!)</strong>
+                  </td>
+                  <td><label for=FAN_SPEED>Fan Speed</label></td>
+                  <td class=inputCell>
+                    <input type=number id="FAN_SPEED" step=1 data-settings /> %
+                  </td>
+              
+                </tr>
+              </thead>
             </thead>
+        </tbody>
+      </table>
+      <br>
+      <table id=gcodeTable>
+        <tbody>
+          <thead>
+            <tr>
+              <td colspan=2 class=tdHead style="text-align: center;">
+                <h3>G-code</h3>
+      
+              </td>
+      
+            </tr>
+      
+            <tr>
+              <td class=gcodeTableLeftHeading>
+                <h4>3D Preview</h4> &nbsp;&nbsp;<a href="https://github.com/aligator/gcode-viewer">Source</a><br>
+                <i>Line widths are approximations only.</i><br><br><br><br>
+                <strong>See my</strong><br>
+                <h5><u><a href="https://ellis3dp.com/Print-Tuning-Guide/">Print Tuning Guide</a></u></h5>
+                and
+                <h5><u><a
+                      href="https://ellis3dp.com/Print-Tuning-Guide/articles/pressure_linear_advance/introduction.html">Pressure
+                      / Linear Advance article</a></u></h5>
+                <strong>for demonstrations and examples!</strong>
+              <td class="tdSection" id="gcode-viewer" colspan="2">
+            </tr>
+            <tr>
+              <td class=tdSection></td>
+              <td id=information class=tdSection colspan=2>
+              </td>
+            </tr>
+            <tr class="tdHead">
+              <td colspan=2><label for="FILENAME" style="text-align: left;">File Name:</label></strong>
+                <input type=text id="FILENAME" data-settings />.gcode&nbsp;
+                <input type=button id="downloadButton" onclick="validate(true); saveTextAsFile();" value="Download G-code" />
+                <font color=red>&nbsp;&nbsp;(Go through ALL the settings first!)</font>
+                <!-- <input type=button id="toggleGcode" onclick="$('#gcodetextarea').parent().toggle();" value="Toggle Gcode Text Preview" /> -->
+                <p id=warning1 style="display: none;">warning</p>
+                <p id=warning2 style="display: none;">warning</p>
+                <p id=warning3 style="display: none;">warning</p>
+                <p id=warning4 style="display: none;">warning</p>
+              </td>
+            </tr>
+            <tr style="display:none;">
+              <td colspan=2 class="txtareatd"><textarea id="gcodetextarea" readonly></textarea></td>
+            </tr>
+          </thead>
         </tbody>
       </table>
     </div>
